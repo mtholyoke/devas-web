@@ -3,10 +3,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta charset="UTF-8">
 <meta http-equiv="Content-Language" content="en">
-<link rel="stylesheet" href="_static/css/page.css" type="text/css">
-<link rel="stylesheet" href="_static/css/boilerplate.css" type="text/css">
-<link rel="stylesheet" href="_static/css/fbm.css" type="text/css">
-<link rel="stylesheet" href="_static/jquery-ui-1.12.1/jquery-ui.min.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="_static/css/page.css">
+<link rel="stylesheet" type="text/css" href="_static/css/boilerplate.css">
+<link rel="stylesheet" type="text/css" href="_static/css/fbm.css">
+<link rel="stylesheet" type="text/css" href="_static/jquery-ui-1.12.1/jquery-ui.min.css">
 <link rel="stylesheet" type="text/css" href="{{ static_url('styles.css') }}">
 {% for src in mpl_js %}
   <script src="_static/jquery/js/{{src}}"></script>
@@ -19,8 +19,8 @@
 {% block head_matter %}{% end %}
 </head><body>
 <header>
- <a href="/"><img id="logo" src="{{ static_url('logo.png') }}"/></a>
- <span class="title">{{ page_title }}</span>
+ <a href="/"><img id="logo" src="{{ static_url('logo.png') }}" alt="DEVAS logo"/></a>
+ <h1>{{ page_title }}</h1>
 </header>
 
 {% block body_matter %}{% end %}
