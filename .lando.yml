@@ -3,17 +3,18 @@ services:
   appserver:
     type: python:3.7
     build_as_root:
-      - apt update && apt install libhdf5-dev libomp-dev python-dev --yes
+      - /app/lando/build_as_root.sh
     build:
-      - /app/container-build.sh
-    # TODO: Make the service start automatically!
+      - /app/lando/build.sh
+    command: /app/lando/command.sh
+    port: 54321
 proxy:
   appserver:
     - devas.lndo.site:54321
 tooling:
+  look:
+    service: appserver
+    cmd: ps auwx | grep python
   python:
     service: appserver
     cmd: /usr/local/bin/python
-  run:
-    service: appserver
-    cmd: /app/container-start.sh
