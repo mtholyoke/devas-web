@@ -13,9 +13,6 @@ proxy:
   appserver:
     - devas.lndo.site:54321
 tooling:
-  look:
-    service: appserver
-    cmd: ps auwx | grep python
   python:
     service: appserver
     cmd: /usr/local/bin/python
