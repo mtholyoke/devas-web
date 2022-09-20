@@ -15,7 +15,4 @@ proxy:
 tooling:
   python:
     service: appserver
-    cmd: ps auwx | grep python
-  run:
-    service: appserver
     cmd: /usr/local/bin/python
