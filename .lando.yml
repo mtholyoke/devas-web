@@ -6,7 +6,8 @@ services:
       - /app/lando/build_as_root.sh
     build:
       - /app/lando/build.sh
-    command: /app/lando/command.sh
+    command:
+      - /app/lando/command.sh
     port: 54321
 proxy:
   appserver:
