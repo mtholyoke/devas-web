@@ -155,8 +155,8 @@ def load_mhc_libs(ds, data_dir, master_file):
         logging.error('%s Failed to load data: %s', log_prefix, str(e))
         return None
 
-    logging.info('%s Collecting metadata...', log_prefix)
-    projects = [set(filter(None, p.split(','))) for p in meta['Projects']]
+    logging.info('%s Collecting metadata projects', log_prefix)
+    projects = [set(filter(None, p.split(b','))) for p in meta['Projects']]
     dates = [d.decode() for d in meta['Date']]
     matrices = [str(m) for m in meta['Matrix']]
     compositions = import_comps(meta, log_prefix)
