@@ -92,14 +92,14 @@ The first time you run `lando start` it will download a Python container and ins
 After the container starts, `lando run` starts the webservice. **TODO:** that should be handled by a `run` key in the service definition in the Landofile, but it doesn’t seem to work there. 
 
 **TODO:** Update versions of dependencies to be consistent with what’s available via `apt` in Ubuntu 22.04 and switch to those for both dev container and production server.
-| package    | current | available `apt`  |
-|------------|---------|------------------|
-| h5py       | 2.10.0  | 3.6.0-2build1    |
-| matplotlib | 3.1.3   | 3.5.1-2build1    |
-| pandas     | 1.0.0   | 1.3.5+dfsg-3     |
-| pywavelets | 1.1.1   | 1.1.1-1ubuntu2   |
-| pyyaml     | 5.3     | 5.4.1-1ubuntu1   |
-| tornado    | 4.4.2   | 6.1.0-3build1    |
+| package    |  current   | available `apt`  |
+|------------|------------|------------------|
+| h5py       |  2.10.0-9  | 3.6.0-2build1    |
+| matplotlib | 3.3.4-1    | 3.5.1-2build1    |
+| pandas     | 1.1.5+dfsg-2 | 1.3.5+dfsg-3   |
+| pywavelets | 1.1.1-1+b2 | 1.1.1-1ubuntu2   |
+| pyyaml     | 5.3.1-5    | 5.4.1-1ubuntu1   |
+| tornado    | 6.1.0-1+b1 | 6.1.0-3build1    |
 
 
 ### Working in the dev environment
