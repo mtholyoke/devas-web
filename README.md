@@ -2,8 +2,7 @@
 
 A web interface to the [Superman](https://github.com/all-umass/superman) tools.
 
-
-## Quick Start
+## Quick Start - current server
 
 Starting from a fresh download of the source files,
 a few steps are required before starting the server for the first time.
@@ -21,7 +20,6 @@ See [the superman docs](https://github.com/all-umass/superman#installation) for 
 For running tests, you'll want:
 
     pip install pytest mock coverage
-
 
 ### 2: Configure
 
@@ -69,6 +67,35 @@ To generate a nice code coverage report:
 
     coverage run --source backend -m pytest
     coverage html
+
+
+
+## Quick Start - Ubuntu 20.04 test server
+
+
+### 1. Install dependencies
+
+1. Python 3.8+ and `pip` installed via `apt`
+1. `apt install --yes libomp-dev python3-dev cython3` 
+1. `apt install --yes python3-h5py python3-matplotlib python3-yaml python3-tornado` 
+1. `pip install PyWavelets==1.1.1`
+1. `pip install pandas==1.1.5`
+1. Clone this repo. `/opt/devas-web` is a good choice.
+1. Install the [Superman](https://github.com/all-umass/superman) library:
+   1. clone its repo into `/opt/superman` because v0.1.2 might not be packaged right for `pip`
+   1. `cd /opt/superman`
+   1. `pip install -e .`
+
+
+### 2. Configure
+
+1. Make a copy of `config-template.yml` named `config.yml`. For dev/test work, the defaults are all sufficient.
+1. Add at least one dataset to the `data/` directory, and create a file `datasets.yml` that has appropriate entries for the datasets.
+
+
+### 3. Run
+
+**TODO:** This should probably be set up as a service but for now there’s a script on the test server, `start-dev-server.sh`. Run that. 
 
 
 
