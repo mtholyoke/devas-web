@@ -158,9 +158,7 @@ def load_mhc_libs(ds, data_dir, master_file):
     logging.info('%s Collecting metadata projects', log_prefix)
     projects = [set(filter(None, p.split(','))) for p in meta['Projects']]
     dates = [str(d) for d in meta['Date']]
-    #dates = np.array_str(dates)
     matrices = [str(m) for m in meta['Matrix']]
-    #matrices = np.array_str(matrices)
     compositions = import_comps(meta, log_prefix)
 
     logging.info('%s Loading data...', log_prefix)
