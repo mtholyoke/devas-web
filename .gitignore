@@ -1,6 +1,7 @@
 # Per-installation config files
 config.yml
 datasets.yml
+custom_datasets.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -63,8 +64,5 @@ docs/_build/
 # PyBuilder
 target/
 
-# IPython Notebook
+# Ipython Notebook
 .ipynb_checkpoints
-
-# Misc cruft
-.DS_Store

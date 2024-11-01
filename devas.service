@@ -1,0 +1,18 @@
+# This file is symlinked from /etc/systemd/system .
+# Use "systemctl [command] devas" to start, restart, or stop the service.
+
+[Unit]
+Description=DEVAS
+Documentation=https://github.com/mtholyoke/devas-web
+PartOf=Network.target
+After=local-fs.target nss-lookup.target  network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/cj/superman-web
+ExecStart=/home/cj/superman-web/start_server.sh
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
+Alias=devas.service
