@@ -9,8 +9,10 @@ After=local-fs.target nss-lookup.target  network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/cj/superman-web
-ExecStart=/home/cj/superman-web/start_server.sh
+User=www-data
+WorkingDirectory=/opt/devas-web
+ExecStart=/opt/devas-web/start_server.sh
+AmbientCapabilities=CAP_NET_BIND_SERVICE
 Restart=no
 
 [Install]

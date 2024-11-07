@@ -1,0 +1,9 @@
+h5py
+matplotlib
+pandas
+PyWavelets
+PyYAML
+scikit-learn
+setuptools
+superman
+tornado
