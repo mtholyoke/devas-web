@@ -4,7 +4,7 @@ import matplotlib
 import os
 import tornado.web
 from collections import defaultdict
-from matplotlib import cm, rcParams
+from matplotlib import colormaps as cm, rcParams
 
 from .common import BaseHandler, BLR_KWARGS
 
@@ -89,7 +89,7 @@ class DataExplorerPage(Subpage):
     def initialize(self):
         bad_cmaps = set(('gist_gray', 'gist_yarg', 'binary'))
         self.cmaps = sorted(
-            [m for m in cm.cmap_d if not m.endswith(
+            [m for m in cm if not m.endswith(
                 '_r') and m not in bad_cmaps],
             key=lambda x: x.lower())
 
