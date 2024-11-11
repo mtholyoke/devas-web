@@ -6,12 +6,12 @@
 <link rel="stylesheet" href="_static/css/page.css" type="text/css">
 <link rel="stylesheet" href="_static/css/boilerplate.css" type="text/css">
 <link rel="stylesheet" href="_static/css/fbm.css" type="text/css">
-<link rel="stylesheet" href="_static/jquery-ui-1.12.1/jquery-ui.min.css" type="text/css">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.min.css" type="text/css">
 <link rel="stylesheet" type="text/css" href="{{ static_url('styles.css') }}">
 {% for src in mpl_js %}
   <script src="_static/jquery/js/{{src}}"></script>
 {% end %}
-<script src="_static/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script src="{{ static_url('jquery.ui.touch-punch.min.js') }}"></script>
 <script src="/mpl.js"></script>
 <script src="{{ static_url('superman.js') }}"></script>
@@ -24,6 +24,8 @@
 </header>
 
 {% block body_matter %}{% end %}
+{#
+<-- We don't know whose this even is, plus Universal Analytics is retired -->
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -32,4 +34,5 @@
   ga('create', 'UA-24536711-3', 'auto');
   ga('send', 'pageview');
 </script>
+#}
 </body></html>

@@ -181,9 +181,14 @@ function onready_boilerplate(ws_uri, fignum) {
       canvas_height = fig_height - 1.8 * em_px;
   var websocket_type = mpl.get_websocket_type();
   var websocket = new websocket_type(ws_uri + fignum + "/ws");
-  fig = new mpl.figure(fignum, websocket, ondownload, fig_div);
+  fig = new mpl.figure(fignum, websocket, ondownload, fig_div[0]);
   // Hack to disable pgf image download option
-  $('.mpl-toolbar-option option')[2].disabled = true;
+  $(".mpl-widget option").each(function( index, element ) {
+    if($(element).text() == "pgf") {
+      element.disabled = true;
+      return false; // found it, stop iterating
+    }
+  });
   // wait for the websocket to be ready, then ask the figure to resize
   var check_ready = setInterval(function(){
     if (websocket.readyState === 1) {

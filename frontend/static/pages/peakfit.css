@@ -1,0 +1,16 @@
+#ds_selector_wrapper { padding-top: 1em; }
+#single_peakfit {
+  display: flex;
+  flex-flow: column nowrap;
+}
+#single_peakfit_options {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-end;
+}
+#fit_result th { padding: 0.2em 1em; text-align: right; font-weight: bold; }
+#fit_result td { padding: 0.2em 1em; text-align: left; }
+#peakfit_params td.ralign { text-align: right; padding-right: 0; }
+#peakfit_params td:last-child { text-align: left; }
+label[for=locfixed]>span:after { content: "approx." }
+label[for=locfixed].ui-state-active>span:after { content: "fixed" }

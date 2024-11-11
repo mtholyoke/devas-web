@@ -1,0 +1,13 @@
+p { padding: 1em 0; }
+.instructions {
+  border-radius: 5px;
+  padding: 0.5em;
+  background-color: lightgreen;
+}
+.instructions caption { font-style: italic; }
+.instructions th { font-weight: bold; border-bottom: 1px solid; padding: 0 0.25em; }
+.instructions td { padding: 0 0.25em; text-align: right; }
+.csv th::after { content: ","; }
+.csv th:last-child::after { content: ""; }
+.csv td::after { content: ","; }
+.csv td:last-child::after { content: ""; }

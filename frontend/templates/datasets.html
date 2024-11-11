@@ -1,16 +1,7 @@
 {% extends "_common.html" %}
 {% block head_matter %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.25.7/js/jquery.tablesorter.min.js"></script>
-<script type="text/javascript">
-function toggle_extra(elt) {
-  $(elt).parents('tr.dataset').nextUntil('tr.dataset')
-        .find('.hideme').slideToggle();
-  return false;
-}
-$(document).ready(function() {
-  $('#datasets').tablesorter();
-})
-</script>
+<script src="static/pages/datasets.js"></script>
 {% end %}
 
 {% block body_matter %}
