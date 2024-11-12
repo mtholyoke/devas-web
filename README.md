@@ -16,7 +16,7 @@ Clone this repo into `/opt/devas-web` as the `www-data` user
 Clone the [Superman repo](https://github.com/all-umass/superman) into `/opt/superman`
 
 ```bash
-sudo apt install -y cython3 libomp-dev python3-dev python3-h5py python3-matplotlib python3-pandas python3-pywt python3-yaml python3-sklearn python3-setuptools python3-tornado python3-venv
+sudo apt install -y cython3 libomp-dev python3-dask python3-dev python3-h5py python3-matplotlib python3-pandas python3-pywt python3-yaml python3-sklearn python3-setuptools python3-tornado python3-venv
 
 python3 -m venv --system-site-packages /opt/devas-venv
 
