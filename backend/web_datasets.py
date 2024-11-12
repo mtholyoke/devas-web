@@ -179,9 +179,7 @@ def _try_get_mtime(filepath):
 
 def _generate_histogram(m):
     # Make a 350px by 32px image for a slider background
-    fig = Figure(figsize=(3.5, 0.32), dpi=100, tight_layout=False)
-    # This is required, even though we don't explicitly use the canvas.
-    canvas = FigureCanvasAgg(fig)
+    fig = Figure(figsize=(3.5, 0.32), dpi=100, layout=None)
     ax = fig.add_subplot(1, 1, 1)
     vrange = float(m.bounds[1] - m.bounds[0])
     num_bins = np.ceil(vrange / m.step) + 1
@@ -190,10 +188,10 @@ def _generate_histogram(m):
         arr = arr[np.isfinite(arr)]
     if np.isnan(num_bins):
         ax.hist(arr)
-    elif num_bins > 300:
-        ax.hist(arr, 300, range=m.bounds)
+    elif int(num_bins) > 300:
+        ax.hist(arr, bins=300, range=m.bounds)
     else:
-        ax.hist(arr, int(num_bins), range=m.bounds)
+        ax.hist(arr, bins=int(num_bins), range=m.bounds)
     ax.axis('off')
     fig.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
     ax.margins(0, 0)
@@ -202,6 +200,7 @@ def _generate_histogram(m):
     # save it as a base64 encoded string
     img_data = BytesIO()
     fig.savefig(img_data, format='png', bbox_inches='tight', pad_inches=0)
+    img_data.seek(0)
     return ensure_str(b64encode(img_data.getvalue()))
 
 
