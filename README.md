@@ -2,30 +2,43 @@
 
 A web interface to the [Superman](https://github.com/all-umass/superman) tools.
 
-## Quick start - current server
 
-Starting from a fresh download of the source files,
-a few steps are required before starting the server for the first time.
+
+## Quick start
+
 
 ### 1: Install dependencies
 
-While it’s theoretically possible to install dependencies using `pip install -r requirements.txt`, we had problems with this on an Ubuntu 24.04 server with Python 3.12 and found this sequence, executed as the `www-data` user, to work well.
+While it’s theoretically possible to install dependencies using `pip install -r requirements.txt`, we had problems with this on an Ubuntu 24.04 server with Python 3.12.
 
-Clone this repo into `/opt/devas-web` as the `www-data` user
-
-Clone the [Superman repo](https://github.com/all-umass/superman) into `/opt/superman`
+You will need root privileges to install an older version of Python and some support libraries. We also elected to install a few modules this way so they could automatically be kept up to date.
 
 ```bash
-sudo apt install -y cython3 libomp-dev python3-dask python3-dev python3-h5py python3-matplotlib python3-pandas python3-pywt python3-yaml python3-sklearn python3-setuptools python3-tornado python3-venv
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.9-full python3.9-dev
+sudo apt install cython3 libfreetype-dev libomp-dev pkg-config
+sudo apt install python3-dask python3-yaml python3-setuptools python3-tornado
+chown www-data:www-data /opt
+```
 
-python3 -m venv --system-site-packages /opt/devas-venv
+The remainder of the instructions below should be executed as the `www-data` user:
 
+```bash
+python3.9 -m venv --system-site-packages /opt/devas-venv
 source /opt/devas-venv/bin/activate
+pip install h5py pandas PyWavelets scikit-learn
+```
 
+Clone the [Superman repo](https://github.com/all-umass/superman) into `/opt/superman`.
+
+```bash
 cd /opt/superman
-
 pip install .
 ```
+
+Clone this repo into `/opt/devas-web` and it should be ready to configure and run.
+
 
 ### 2: Configure
 
@@ -47,23 +60,45 @@ of the process running `superman_server.py`,
 typically the root of this repository.
 
 
-### 4: Run
+
+## Running the service
+
+
+### Using `systemctl`
+
+We have provided a Systemd service definition for automatically starting and stopping the service. It can be symlinked to make using it easy:
+
+```bash
+sudo ln -s /opt/devas-web/devas.service /etc/systemd/system/
+sudo systemctl daemon-reload
+```
+
+It provides the usual `start`/`stop`/`restart` functionality; don’t forget to
+```bash
+sudo systemctl enable devas.service
+```
+to have start on server reboot.
+
+
+### Manual control
 
 To start (or restart) the server in the background for typical use, run:
-
-    ./restart_server.sh
+```bash
+./restart_server.sh
+```
 
 Use the option `--dry-run` to check what would happen without interfering
 with any currently running server.
 
 Or simply run the server directly, and handle the details yourself:
-
-    python superman_server.py
+```bash
+python superman_server.py
+```
 
 To stop the server without restarting it, use:
-
-    ./restart_server.sh --kill
-
+```bash
+./restart_server.sh --kill
+```
 
 
 ## Other notes
