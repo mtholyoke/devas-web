@@ -1,0 +1,18 @@
+#wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1000px;
+}
+form {
+  display: flex;
+  flex-flow: column;
+  padding: 1em 0;
+}
+form>div { padding-bottom: 1em; }
+input[type="text"] { width: 15em; }
+#ds_kind { padding-right: 3em; }
+#search_result { padding: 1em 0 0 1em; }
+.no_results { font-style: italic; }
+.ds_result { padding-top: 1em; }

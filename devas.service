@@ -1,0 +1,20 @@
+# This file is symlinked from /etc/systemd/system .
+# Use "systemctl [command] devas" to start, restart, or stop the service.
+
+[Unit]
+Description=DEVAS
+Documentation=https://github.com/mtholyoke/devas-web
+PartOf=Network.target
+After=local-fs.target nss-lookup.target  network-online.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/devas-web
+ExecStart=/opt/devas-web/start_server.sh
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
+Alias=devas.service

@@ -69,11 +69,17 @@ def main():
         nightly_refresh_ips = [nightly_refresh_ips]
 
     logging.info('Starting server...')
+    ssl_options = {
+        'certfile': config.get('ssl_cert_file', None),
+        'keyfile': config.get('ssl_cert_file', None),
+    }
     server = MatplotlibServer(
         all_routes, password=password, login_url=r'/login',
         template_path=os.path.join(webserver_dir, 'frontend', 'templates'),
         static_path=os.path.join(webserver_dir, 'frontend', 'static'),
-        cookie_secret=cookie_secret, nightly_refresh_ips=nightly_refresh_ips)
+        cookie_secret=cookie_secret,
+        #cookie_secret=cookie_secret, ssl_options=ssl_options,
+        nightly_refresh_ips=nightly_refresh_ips)
     server.run_forever(int(config.get('port', 54321)))
 
 

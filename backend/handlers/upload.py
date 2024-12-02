@@ -29,7 +29,6 @@ from six.moves import range
 # parsing as an excel file fails.
 class UncloseableBytesIO(BytesIO):
     """Wraps BytesIO and prevents the file from being closed."""
-
     def close(self):
         pass
 
@@ -51,8 +50,7 @@ class SpectrumUploadHandler(BaseHandler):
             query = parse_spectrum(fh)
         except Exception:
             try:
-                fh = StringIO(f['body'].decode(
-                    'utf-8', 'ignore'), newline=None)
+                fh = StringIO(f['body'].decode('utf-8', 'ignore'), newline=None)
                 query = parse_spectrum(fh)
             except Exception:
                 logging.exception('Spectrum parse failed.')
@@ -78,11 +76,8 @@ class DatasetUploadHandler(BaseHandler):
             resample = None
 
         if ds_kind not in DATASETS:
-            self.visible_error(
-                400,
-                'Invalid dataset kind.',
-                'Invalid ds_kind: %r',
-                ds_kind)
+            self.visible_error(400, 'Invalid dataset kind.', 'Invalid ds_kind: %r',
+                               ds_kind)
             return
 
         if ds_name in DATASETS[ds_kind]:
@@ -105,7 +100,7 @@ class DatasetUploadHandler(BaseHandler):
 
         # Return a link to the new dataset to signal the upload succeeded.
         self.write('/explorer?ds_kind=%s&ds_name=%s' % (
-            ds_kind, url_escape(ds_name, plus=False)))
+                   ds_kind, url_escape(ds_name, plus=False)))
 
         # Kick off a background thread to save this new dataset to disk.
         t = Thread(target=_save_ds, args=(ds_kind, ds_name))
@@ -153,13 +148,17 @@ def _load_metadata_csv(f=None):
 
     meta_kwargs = {}
     for i, name in enumerate(meta.columns[1:]):
-        x = meta[name].values
-        if np.issubdtype(x.dtype, np.bool_):
-            m = BooleanMetadata(x, display_name=name)
-        elif np.issubdtype(x.dtype, np.number):
-            m = NumericMetadata(x, display_name=name)
-        else:
-            m = LookupMetadata(x, display_name=name)
+        try:
+            x = meta[name].values
+            if np.issubdtype(x.dtype, np.bool_):
+                m = BooleanMetadata(x, display_name=name)
+            elif np.issubdtype(x.dtype, np.number):
+                m = NumericMetadata(x, display_name=name)
+            else:
+                m = LookupMetadata([w.encode('utf-8') if isinstance(w, str) else str(w) for w in x], display_name=name)
+        except Exception as e:
+            logging.error(f"Cannot process '{name}' metadata: {e}")
+            raise
         # use a JS-friendly string key
         meta_kwargs['k%d' % i] = m
 
@@ -259,9 +258,12 @@ def _vector_ds(fh, ds_name, ds_kind, meta_kwargs, meta_pkeys, resample,
         spectra = spectra[:, mask]
 
     if ds_kind == 'LIBS' and wave.shape[0] not in (6144, 6143, 5485):
+        # return (415, 'Wrong number of channels for LIBS data: %d.' % wave.shape[0])
         logging.info('wave.shape[0]: {}'.format(wave.shape[0]))
 
+    logging.info('Attempting to match keys')
     # make sure there's no whitespace sticking to the pkeys
+    pkey = [k.decode('utf-8') for k in pkey]
     pkey = np.char.strip(pkey).astype(str, copy=False)
 
     if len(meta_pkeys) > 0 and not np.array_equal(meta_pkeys, pkey):
@@ -270,16 +272,21 @@ def _vector_ds(fh, ds_name, ds_kind, meta_kwargs, meta_pkeys, resample,
                          'wrong number of meta_pkeys for vector data')
         meta_order = np.argsort(meta_pkeys)
         data_order = np.argsort(pkey)
+        for i in range(len(meta_pkeys)):
+            if meta_pkeys[meta_order[i]] != pkey[data_order[i]]:
+                logging.info(f"meta {meta_pkeys[meta_order[i]]} != pkey {pkey[data_order[i]]}")
         if not np.array_equal(meta_pkeys[meta_order], pkey[data_order]):
             return (415, 'Spectrum and metadata names mismatch.')
         # convert data to meta order
-        order = data_order[meta_order]
+        order = np.zeros_like(data_order)
+        order[meta_order] = np.arange(len(order))
+        order = data_order[order]
         data = data[order]
         assert np.array_equal(meta_pkeys, pkey[order])
 
     try:
         pkey = PrimaryKeyMetadata(pkey)
-    except AssertionError:  # XXX: convert this to a real error
+    except AssertionError:  # TODO: convert this to a real error
         return (415, 'Primary keys not unique.')
 
     # make sure wave is in increasing order
@@ -377,15 +384,13 @@ def _save_ds(ds_kind, ds_name):
         for key, m in ds.metadata.items():
             try:
                 arr = np.array(m.get_array())
-            except BaseException:
-                logging.exception(
-                    'Failed to get_array for %s /meta/%s', ds, key)
+            except:
+                logging.exception('Failed to get_array for %s /meta/%s', ds, key)
                 continue
             if arr.dtype.char == 'U':
                 arr = np.char.encode(arr, 'utf8')
             fh['/meta/' + key] = arr
-            entry['metadata'].append(
-                [key, type(m).__name__, m.display_name(key)])
+            entry['metadata'].append([key, type(m).__name__, m.display_name(key)])
     # Clean up if no metadata was added.
     if not entry['metadata']:
         del entry['metadata']

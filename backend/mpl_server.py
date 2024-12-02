@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function, division
 from matplotlib.figure import Figure
+from pathlib import Path
 import tornado.websocket
 import tornado.web
 import tornado.ioloop
@@ -190,6 +191,10 @@ class MatplotlibServer(tornado.web.Application):
             ('/mpl.js', self.MplJs),
             (r'/([0-9]+)/ws', self.WebSocket),
             (r'/([0-9]+)/download.([a-z0-9.]+)', self.Download),
+            # Static images for the toolbar
+            (r'/_images/(.*)',
+             tornado.web.StaticFileHandler,
+             {'path': Path(matplotlib.get_data_path(), 'images')}),
         ] + list(handlers)
         super(MatplotlibServer, self).__init__(handlers, **kwargs)
         self.figure_data = {}  # id -> FigData

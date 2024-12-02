@@ -1,0 +1,31 @@
+diff --git a/superman/distance/_pdist.pyx b/superman/distance/_pdist.pyx
+index e985713..c1db09c 100644
+--- a/superman/distance/_pdist.pyx
++++ b/superman/distance/_pdist.pyx
+@@ -1,9 +1,10 @@
+ # cython: boundscheck=False
+ # cython: wraparound=False
+ # cython: nonecheck=False
++# cython: language_level=3str
+ from cython.parallel import prange
+ from libc.math cimport fmin, fabs, sqrt
+-from common cimport match_score as ms, combo_score as combo
++from superman.distance.common cimport match_score as ms, combo_score as combo
+ 
+ 
+ cpdef void match_between(double[:,::1] query, double[:,::1] target,
+diff --git a/superman/distance/_traj.pyx.in b/superman/distance/_traj.pyx.in
+index 0060ff9..0fd9c92 100644
+--- a/superman/distance/_traj.pyx.in
++++ b/superman/distance/_traj.pyx.in
+@@ -5,8 +5,9 @@
+ # cython: wraparound=False
+ # cython: nonecheck=False
+ # cython: cdivision=True
++# cython: language_level=3str
+ from libc.math cimport fmin, fabs, sqrt
+-from common cimport optimal_band_eps, match_score, combo_score, minimum
++from superman.distance.common cimport optimal_band_eps, match_score, combo_score, minimum
+ {{py:
+ METRICS = ['match', 'combo']
+ }}

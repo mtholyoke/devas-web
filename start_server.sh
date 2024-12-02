@@ -7,7 +7,7 @@ function find_server_pid() {
 function start_server() {
   echo "Starting new server..."
   source /opt/devas-venv/bin/activate
-  nohup python3 superman_server.py &>logs/errors.out &
+  python3 superman_server.py &>logs/errors.out
   $follow_log || echo "Use 'tail -f logs/server.log' to check on it"
   sleep 1
   if [[ -z "$(find_server_pid)" ]]; then
@@ -53,7 +53,7 @@ done
 # Check if the webserver is still running
 server_pid=$(find_server_pid)
 if [[ -z "$server_pid" ]]; then
-  echo "No currently running server found."
+  # echo "No currently running server found."
   $dry_run || $only_kill || start_server
   exit
 fi
