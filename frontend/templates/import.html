@@ -1,54 +1,7 @@
 {% extends "_common.html" %}
 {% block head_matter %}
-<script type="text/javascript">
-function upload_dataset() {
-  var msg = $('#import_result').empty();
-  var form = $('form')[0];
-  if (!form.checkValidity()) {
-    return;
-  }
-  var post_data = new FormData(form);
-  post_data.append('ds_kind', $('#ds_kind option:selected', form).val());
-  var wait = $('.wait', form).show();
-  $.ajax({
-    url: '/_upload_dataset',
-    data: post_data,
-    processData: false,
-    contentType: false,
-    type: 'POST',
-    error: function(jqXHR, textStatus, errorThrown) {
-      wait.hide();
-      msg.html(jqXHR.responseText);
-    },
-    success: function(url) {
-      wait.hide();
-      $('input', form).val(''); // reset the form inputs
-      msg.html('Dataset imported. <a href="' + url + '">Explore</a>.');
-    }
-  });
-}
-$(document).ready(function(){
-  var si = $('#spectrum_instructions'),
-      mi = $('#metadata_instructions');
-  $('#spectrum_row').mouseenter(function(){si.show(); mi.hide();});
-  $('#metadata_row').mouseenter(function(){mi.show(); si.hide();});
-});
-</script>
-<style type="text/css">
-p { padding: 1em 0; }
-.instructions {
-  border-radius: 5px;
-  padding: 0.5em;
-  background-color: lightgreen;
-}
-.instructions caption { font-style: italic; }
-.instructions th { font-weight: bold; border-bottom: 1px solid; padding: 0 0.25em; }
-.instructions td { padding: 0 0.25em; text-align: right; }
-.csv th::after { content: ","; }
-.csv th:last-child::after { content: ""; }
-.csv td::after { content: ","; }
-.csv td:last-child::after { content: ""; }
-</style>
+<script src="static/pages/import.js"></script>
+<link rel="stylesheet" href="static/pages/import.css" type="text/css">
 {% end %}
 {% block body_matter %}
 <p>

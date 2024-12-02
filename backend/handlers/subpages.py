@@ -8,9 +8,6 @@ from matplotlib import cm, rcParams
 
 from .common import BaseHandler, BLR_KWARGS
 
-MPL_JS = sorted(os.listdir(os.path.join(matplotlib.__path__[0],
-                                        'backends/web_backend/jquery/js')))
-
 
 class MainPage(BaseHandler):
     def get(self):
@@ -23,7 +20,6 @@ class MainPage(BaseHandler):
             'index.html',
             page_title='Data Exploration, Visualization, and Analysis for Spectroscopy',
             subpage_info=subpage_info,
-            mpl_js=MPL_JS,
             logged_in=logged_in)
 
 
@@ -61,7 +57,6 @@ class Subpage(BaseHandler):
 
     def render(self, **kwargs):
         kwargs['page_title'] = self.title
-        kwargs['mpl_js'] = MPL_JS
         if self.figsize is not None:
             kwargs['ws_uri'] = "ws://{req.host}/".format(req=self.request)
             if 'fig_id' not in kwargs:

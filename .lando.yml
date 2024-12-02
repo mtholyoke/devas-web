@@ -1,18 +1,21 @@
 name: devas
 services:
   appserver:
-    type: python:3.7
-    build_as_root:
-      - /app/lando/build_as_root.sh
+    type: python:3.10
+    # build_as_root:
+    #   - /app/lando/build_as_root.sh
     build:
       - /app/lando/build.sh
-    command:
-      - /app/lando/command.sh
-    port: 54321
+    # command:
+    #   - /app/lando/command.sh
+    # port: 54321
 proxy:
   appserver:
     - devas.lndo.site:54321
 tooling:
+  pycodestyle:
+    service: appserver
+    cmd: /var/www/.local/bin/pycodestyle
   python:
     service: appserver
     cmd: /usr/local/bin/python

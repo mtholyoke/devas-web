@@ -2,24 +2,43 @@
 
 A web interface to the [Superman](https://github.com/all-umass/superman) tools.
 
-## Quick Start - current server
 
-Starting from a fresh download of the source files,
-a few steps are required before starting the server for the first time.
 
-### 1: Install Dependencies
+## Quick start
 
-Python (2.7 or 3.4+) is the main requirement for running the server.
-Several Python packages are needed, available from PyPI via `pip`:
 
-    pip install --only-binary :all: superman matplotlib tornado pyyaml h5py pandas
+### 1: Install dependencies
 
-If you're not running Linux, `superman` may require special care to install.
-See [the superman docs](https://github.com/all-umass/superman#installation) for instructions.
+While it’s theoretically possible to install dependencies using `pip install -r requirements.txt`, we had problems with this on an Ubuntu 24.04 server with Python 3.12.
 
-For running tests, you'll want:
+You will need root privileges to install an older version of Python and some support libraries. We also elected to install a few modules this way so they could automatically be kept up to date.
 
-    pip install pytest mock coverage
+```bash
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.9-full python3.9-dev
+sudo apt install cython3 libfreetype-dev libomp-dev pkg-config
+sudo apt install python3-dask python3-yaml python3-setuptools python3-tornado
+chown www-data:www-data /opt
+```
+
+The remainder of the instructions below should be executed as the `www-data` user:
+
+```bash
+python3.9 -m venv --system-site-packages /opt/devas-venv
+source /opt/devas-venv/bin/activate
+pip install h5py pandas PyWavelets scikit-learn
+```
+
+Clone the [Superman repo](https://github.com/all-umass/superman) into `/opt/superman`.
+
+```bash
+cd /opt/superman
+pip install .
+```
+
+Clone this repo into `/opt/devas-web` and it should be ready to configure and run.
+
 
 ### 2: Configure
 
@@ -31,7 +50,7 @@ In the same way, copy `datasets-template.yml` to `datasets.yml`
 and update the listings to match your local datasets.
 
 
-### 3: Add Datasets
+### 3: Add datasets
 
 Datasets are the basic unit of data in the superman server.
 Add one by modifying the `datasets.yml` configuration file,
@@ -41,93 +60,64 @@ of the process running `superman_server.py`,
 typically the root of this repository.
 
 
-### 4: Run
+
+## Running the service
+
+
+### Using `systemctl`
+
+We have provided a Systemd service definition for automatically starting and stopping the service. It can be symlinked to make using it easy:
+
+```bash
+sudo ln -s /opt/devas-web/devas.service /etc/systemd/system/
+sudo systemctl daemon-reload
+```
+
+It provides the usual `start`/`stop`/`restart` functionality; don’t forget to
+```bash
+sudo systemctl enable devas.service
+```
+to have start on server reboot.
+
+
+### Manual control
 
 To start (or restart) the server in the background for typical use, run:
-
-    ./restart_server.sh
+```bash
+./restart_server.sh
+```
 
 Use the option `--dry-run` to check what would happen without interfering
 with any currently running server.
 
 Or simply run the server directly, and handle the details yourself:
-
-    python superman_server.py
+```bash
+python superman_server.py
+```
 
 To stop the server without restarting it, use:
+```bash
+./restart_server.sh --kill
+```
 
-    ./restart_server.sh --kill
 
-If you want to verify that everything is working as intended,
-try running the test suite (located in the `test/` directory):
+## Other notes
 
-    python -m pytest
+Original documentation claimed that we could set up to run tests:
+
+```bash
+pip install pytest mock coverage
+```
+
+If you want to verify that everything is working as intended, try running the test suite (located in the `test/` directory):
+
+```bash
+python -m pytest
+```
 
 To generate a nice code coverage report:
 
-    coverage run --source backend -m pytest
-    coverage html
-
-
-
-## Quick Start - Ubuntu 20.04 test server
-
-
-### 1. Install dependencies
-
-1. Python 3.8+ and `pip` installed via `apt`
-1. `apt install --yes libomp-dev python3-dev cython3` 
-1. `apt install --yes python3-h5py python3-matplotlib python3-yaml python3-tornado` 
-1. `pip install PyWavelets==1.1.1`
-1. `pip install pandas==1.1.5`
-1. Clone this repo. `/opt/devas-web` is a good choice.
-1. Install the [Superman](https://github.com/all-umass/superman) library:
-   1. clone its repo into `/opt/superman` because v0.1.2 might not be packaged right for `pip`
-   1. `cd /opt/superman`
-   1. `pip install -e .`
-
-
-### 2. Configure
-
-1. Make a copy of `config-template.yml` named `config.yml`. For dev/test work, the defaults are all sufficient.
-1. Add at least one dataset to the `data/` directory, and create a file `datasets.yml` that has appropriate entries for the datasets.
-
-
-### 3. Run
-
-**TODO:** This should probably be set up as a service but for now there’s a script on the test server, `start-dev-server.sh`. Run that. 
-
-
-
-## Developing in Lando
-
-You will need a reasonably current version of [Lando](https://lando.dev/) (this was developed in version 3.6.4) and whichever version of Docker it prefers.
-
-
-### Preparation
-
-1. Make a copy of `config-template.yml` named `config.yml`. For dev work, the defaults are all sufficient (if you change the port, also change it in `.lando.yml`).
-1. Add a dataset to the `data/` directory, and create a file `datasets.yml` that has an entry for it.
-
-**TODO:** Include a sample dataset?
-
-
-### First run
-
-The first time you run `lando start` it will download a Python container, install the relevant packages, and start the DEVAS service at http://devas.lndo.site. Subsequent `start`s will go much faster.
-
-**TODO:** Update versions of dependencies to be consistent with what’s available via `apt` for the dev container (Debian 11) and next production server (Ubuntu 20.04 or Ubuntu 22.04):
-| package    | current | Debian 11    | Ubuntu 20           | Ubuntu 22      |
-|------------|---------|--------------|---------------------|----------------|
-| h5py       | 2.10.0  | 2.10.0-9     | 2.10.0-2build2      | 3.6.0-2build1  |
-| matplotlib | 3.1.3   | 3.3.4-1      | 3.1.2-1ubuntu4      | 3.5.1-2build1  |
-| pandas     | 1.0.0   | 1.1.5+dfsg-2 | n/a – use `pip`     | 1.3.5+dfsg-3   |
-| pywavelets | 1.1.1   | 1.1.1-1+b2   | n/a – use `pip`     | 1.1.1-1ubuntu2 |
-| pyyaml     | 5.3     | 5.3.1-5      | 5.3.1-1             | 5.4.1-1ubuntu1 |
-| tornado    | 4.4.2   | 6.1.0-1+b1   | 6.0.3+really5.1.1-3 | 6.1.0-3build1  |
-
-
-### Working in the dev environment
-
-Once the container is running, `lando python` will execute Python inside the container. 
-
+```bash
+coverage run --source backend -m pytest
+coverage html
+```

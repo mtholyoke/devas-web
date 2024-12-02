@@ -95,8 +95,7 @@ class _ReloadableMixin(object):
             init_js.append(ijs)
             collect_js.append((key, cjs))
             if isinstance(m, CompositionMetadata):
-                filter_htmls.extend(
-                    _get_composition_filter_html(m, key, full_key))
+                filter_htmls.extend(_get_composition_filter_html(m, key, full_key))
             else:
                 filter_htmls.append(_get_filter_html(m, key, full_key))
         return filter_htmls, init_js, collect_js
@@ -142,14 +141,14 @@ class WebLIBSDataset(WebVectorDataset):
         if 'si' not in metadata:
             # Compute the Si ratio as a proxy for temperature
             chan_ranges = (288., 288.5, 633., 635.5)
-            den_lo, den_hi, num_lo, num_hi = np.searchsorted(
-                bands, chan_ranges)
-            si_ratio = np.asarray(spectra[:, num_lo:num_hi].max(axis=1) /
-                                  spectra[:, den_lo:den_hi].max(axis=1))
+            den_lo, den_hi, num_lo, num_hi = np.searchsorted(bands, chan_ranges)
+            si_ratio = np.asarray(spectra[:, num_lo:num_hi].max(axis=1) / spectra[:, den_lo:den_hi].max(axis=1))
             np.maximum(si_ratio, 0, out=si_ratio)
             metadata['si'] = NumericMetadata(si_ratio, display_name='Si Ratio')
 
         # Set data as usual, with the Si ratio added
+        # jproctor 2022-12-07
+        # logging.info(self.name, ' metadata keys: ', metadata.keys())
         VectorDataset.set_data(self, bands, spectra, pkey=pkey, **metadata)
 
     def view(self, **kwargs):
@@ -218,8 +217,7 @@ def _get_filter_js(m, full_key):
         collect_js = 'slider_values("#%s_label")' % full_key
         return init_js, collect_js
     if isinstance(m, DateMetadata):
-        return '', '[$("#%s_lb").val(),$("#%s_ub").val()]' % (
-            full_key, full_key)
+        return '', '[$("#%s_lb").val(),$("#%s_ub").val()]' % (full_key, full_key)
     if isinstance(m, CompositionMetadata):
         init_parts, collect_parts = [], []
         for k, mm in m.comps.items():
@@ -241,15 +239,15 @@ def _get_filter_js(m, full_key):
 def _numeric_filter_html(display_name, full_key, lb, ub, hist_image):
     # TODO: convert this to a Jinja template.
     html = '''
-  <div>{display_name}:
-    <span id="{full_key}_label">
-      <span>{lb}</span> to <span>{ub}</span>
-    </span>
-  </div>
-  <div class="slider" id="{full_key}"
-       style="background-image: url(data:img/png;base64,{hist_image});">
-  </div>
-  '''.format(**locals())
+    <div>{display_name}:
+      <span id="{full_key}_label">
+        <span>{lb}</span> to <span>{ub}</span>
+      </span>
+    </div>
+    <div class="slider" id="{full_key}"
+         style="background-image: url(data:img/png;base64,{hist_image});">
+    </div>
+    '''.format(**locals())
     return re.sub(r'\s+', ' ', html)
 
 
@@ -291,6 +289,5 @@ def _get_filter_html(m, key, full_key):
 def _get_composition_filter_html(m, key, full_key):
     html_parts = []
     for k, m in m.comps.items():
-        html_parts.append(_get_filter_html(
-            m, key + '-' + k, full_key + '-' + k))
+        html_parts.append(_get_filter_html(m, key + '-' + k, full_key + '-' + k))
     return html_parts
