@@ -309,7 +309,7 @@ def _add_plot(fig, ax, plot_data, color_data, pkeys, lw=1, cmap='_auto',
 
     if plot_data.scatter:
         data, = plot_data.trajs
-        artist = ax.scatter(*data.T, marker='o', c=colors, edgecolor='none',
+        artist = ax.scatter(*data.T, marker='o', c=colors, edgecolors=None,
                             s=lw * 20, cmap=cmap, alpha=alpha, picker=5)
     else:
         # trajectory plot

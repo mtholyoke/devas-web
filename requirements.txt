@@ -7,5 +7,5 @@ PyWavelets
 PyYAML
 scikit-learn
 setuptools
-superman
-tornado
+superman==0.1.2
+tornado==4.5.3

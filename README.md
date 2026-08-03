@@ -1,4 +1,4 @@
-# superman-web
+# DEVAS Web
 
 A web interface to the [Superman](https://github.com/all-umass/superman) tools.
 
@@ -18,8 +18,8 @@ sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt update
 sudo apt install python3.9-full python3.9-dev
 sudo apt install cython3 libfreetype-dev libomp-dev pkg-config
-sudo apt install python3-dask python3-yaml python3-setuptools python3-tornado
-chown www-data:www-data /opt
+sudo apt install python3-dask python3-yaml python3-setuptools
+sudo chown www-data:www-data /opt
 ```
 
 The remainder of the instructions below should be executed as the `www-data` user:
@@ -37,7 +37,12 @@ cd /opt/superman
 pip install .
 ```
 
-Clone this repo into `/opt/devas-web` and it should be ready to configure and run.
+Clone this repo into `/opt/devas-web` and it should be ready to configure and run after picking up the last few dependencies.
+
+```bash
+cd /opt/devas-web
+pip install -r requirements.txt
+```
 
 
 ### 2: Configure
