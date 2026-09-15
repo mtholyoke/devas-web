@@ -1,18 +1,19 @@
 ---
 # Copy this template to config.yml, then make changes
-# as needed for your local install.
+# as needed for your local install. Default values are
+# commented out.
 
 # Port to serve the website on.
-port: 54321
+#port: 54321
 
 # Paths are relative to the location of superman_server.py
 # File specifying the locations and contents of dataset files.
-datasets: datasets.yml
+#datasets: datasets.yml
 
 # Location of the server's logfile.
 # On restart, the previous logfile will be saved to a new name
 # based on the timestamp: <logfile>.<timestamp>
-logfile: logs/server.log
+#logfile: logs/server.log
 
 # Login password for access to private datasets and tools.
 # If not provided, the server will disable login
@@ -24,10 +25,16 @@ password: mypassword123
 # Random string for encrypting cookie data.
 # If not provided, the server will generate a new secret on startup.
 # NOTE: Don't specify this unless you know what you're doing!
-# cookie_secret: "<some random string>"
+#cookie_secret: "<some random string>"
 
 # Allowed IP addresses for nightly refresh.
 # If provided, the IP address(es) listed may request a data
-# refresh without authenticating. 
+# refresh without authenticating.
 # NOTE: Don't specify this unless you know what you're doing!
-# nightly_refresh_ips: []
+#nightly_refresh_ips: []
+
+# Secure proxy is present.
+# Set this to True to write URLs using secure schema (https and
+# ws) when the application is running behind a proxy server
+# that enforces secure connections.
+#secure_proxy: False

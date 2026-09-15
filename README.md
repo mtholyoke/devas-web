@@ -106,6 +106,36 @@ To stop the server without restarting it, use:
 ```
 
 
+## Running behind a secure proxy
+
+The application does not currently support SSL, but it can run behind a proxy server to provide a secure layer.
+
+Set `secure_proxy: True` in `config.yml` and configure the proxy to pass all `https://` and `wss://` requests through to the application using `http://` and `ws://` on whatever port it uses (default `54321` if not also set in `config.yml`).
+
+
+### Apache 2.4
+
+Be sure `mod_headers`, `mod_proxy`, `mod_proxy_http`, and `mod_rewrite` are enabled. If your Apache is _older_ than 2.4.47, also enable `mod_proxy_wstunnel`.
+
+This configuration tests for whether the `Upgrade` header is present and contains the word `websocket`, then changes the schema appropriately before passing the request to the application running on the same server.
+
+```ApacheConf
+  RequestHeader set X-Forwarded-Proto "https"
+  RequestHeader set X-Forwarded-Port  "443"
+
+  RewriteEngine On
+  RewriteCond %{HTTP:Upgrade} !=websocket [NC]
+  RewriteRule ^/?(.*)$ http://localhost:54321/$1 [P,L]
+  RewriteCond %{HTTP:Upgrade} =websocket [NC]
+  RewriteRule ^/?(.*)$ ws://localhost:54321/$1 [P,L]
+
+  ProxyPreserveHost On
+  ProxyPassReverse / http://localhost:54321/
+  ProxyPassReverse / ws://localhost:54321/
+```
+
+
+
 ## Other notes
 
 Original documentation claimed that we could set up to run tests:

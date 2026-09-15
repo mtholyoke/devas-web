@@ -58,7 +58,12 @@ class Subpage(BaseHandler):
     def render(self, **kwargs):
         kwargs['page_title'] = self.title
         if self.figsize is not None:
-            kwargs['ws_uri'] = "ws://{req.host}/".format(req=self.request)
+            secure_proxy = (
+                'secure_proxy' in self.application.settings
+                and self.application.settings['secure_proxy']
+            )
+            scheme = 'wss' if secure_proxy else 'ws'
+            kwargs['ws_uri'] = f"{scheme}://{self.request.host}/"
             if 'fig_id' not in kwargs:
                 kwargs['fig_id'] = self.application.register_new_figure(
                     self.figsize)
