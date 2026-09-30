@@ -201,7 +201,8 @@ class MatplotlibServer(tornado.web.Application):
         self.login_password = str(password)
 
     def run_forever(self, port):
-        self.listen(port)
+        max_size = self.application.settings['max_upload_size'] * 1024 * 1024
+        self.listen(port, max_body_size=max_size, max_buffer_size=max_size)
         print('Running at http://%s:%d/' % (socket.gethostname(), port))
         print('Press Ctrl+C to quit')
         tornado.ioloop.IOLoop.instance().start()

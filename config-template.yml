@@ -38,3 +38,9 @@ password: mypassword123
 # ws) when the application is running behind a proxy server
 # that enforces secure connections.
 #secure_proxy: False
+
+# Maximum upload size (in MB).
+# The Tornado default is 100 MB. Exceeding this limit causes a
+# 502 Bad Gateway error when uploading a new dataset.
+# NOTE: Do not specify units.
+#max_upload_size: 100

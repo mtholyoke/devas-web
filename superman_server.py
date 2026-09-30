@@ -75,7 +75,9 @@ def main():
         static_path=os.path.join(webserver_dir, 'frontend', 'static'),
         cookie_secret=cookie_secret,
         nightly_refresh_ips=nightly_refresh_ips,
-        secure_proxy=config.get('secure_proxy', False))
+        secure_proxy=config.get('secure_proxy', False),
+        max_upload_size=config.get('max_upload_size', 100),
+        xheaders=True)
     server.run_forever(int(config.get('port', 54321)))
 
 
