@@ -3,10 +3,9 @@ import logging
 import os
 import tornado.web
 import yaml
-from tornado import gen
-from threading import Thread
 
 from .common import BaseHandler
+from ..thread_pool import run_in_thread
 from ..web_datasets import DATASETS
 
 
@@ -17,18 +16,11 @@ class RefreshHandler(BaseHandler):
                   <input type='submit' value='Refresh Data'>
                   </form>''')
 
-    @gen.coroutine
-    def post(self):
+    async def post(self):
         logging.info('Refreshing datasets')
         for ds in self.all_datasets():
-            yield gen.Task(RefreshHandler._reload, ds)
+            await run_in_thread(ds.reload)
         self.redirect('/datasets')
-
-    @staticmethod
-    def _reload(ds, callback=None):
-        t = Thread(target=lambda: callback(ds.reload()))
-        t.daemon = True
-        t.start()
 
 
 class RemovalHandler(BaseHandler):
@@ -50,8 +42,7 @@ class RemovalHandler(BaseHandler):
 
 
 class NightlyRefreshHandler(BaseHandler):
-    @gen.coroutine
-    def post(self):
+    async def post(self):
         ip = self.request.remote_ip
         allowed_ips = self.application.settings['nightly_refresh_ips']
         if ip not in allowed_ips:
@@ -60,7 +51,7 @@ class NightlyRefreshHandler(BaseHandler):
             return
         logging.info('Refreshing datasets for ip {} after nightly'.format(ip))
         for ds in self.all_datasets():
-            yield gen.Task(RefreshHandler._reload, ds)
+            await run_in_thread(ds.reload)
         return
 
 

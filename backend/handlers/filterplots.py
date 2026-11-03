@@ -11,7 +11,6 @@ from matplotlib.gridspec import GridSpec
 from matplotlib.patches import Patch
 from six import text_type
 from six.moves import xrange
-from tornado import gen
 
 from ..thread_pool import run_cpu_bound
 from .common import MultiDatasetHandler
@@ -137,8 +136,7 @@ class FilterPlotHandler(MultiDatasetHandler):
             rows.append([text_type(col[i]) for col in meta_columns])
         return rows
 
-    @gen.coroutine
-    def post(self):
+    async def post(self):
         fig_data = self.get_fig_data()
         if fig_data is None:
             self.visible_error(403, "Broken connection to server.")
@@ -200,8 +198,8 @@ class FilterPlotHandler(MultiDatasetHandler):
 
         # generate, decorate, and draw the plot
         do_legend = bool(int(self.get_argument('legend')))
-        ax = yield gen.Task(_async_draw_plot, fig_data, plot_data, color_data,
-                            plot_kwargs, do_legend, pkeys)
+        ax = await _async_draw_plot(fig_data, plot_data, color_data,
+                                    plot_kwargs, do_legend, pkeys)
         # return the axis limits
         xmin, xmax = ax.get_xlim()
         ymin, ymax = ax.get_ylim()
@@ -275,7 +273,7 @@ class FilterPlotHandler(MultiDatasetHandler):
 
 
 def _async_draw_plot(fig_data, plot_data, color_data, plot_kwargs, do_legend,
-                     pkeys, callback=None):
+                     pkeys):
     fig = fig_data.figure
 
     def helper():
@@ -286,9 +284,9 @@ def _async_draw_plot(fig_data, plot_data, color_data, plot_kwargs, do_legend,
                        do_legend, plot_kwargs['cmap'])
         fig_data.manager.canvas.draw()
         fig_data.last_plot = 'filterplot'
-        callback(ax)
+        return ax
 
-    run_cpu_bound(target=helper)
+    return run_cpu_bound(helper)
 
 
 def _get_color_data(ds_views, caxis):

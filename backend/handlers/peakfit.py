@@ -5,7 +5,6 @@ import os
 import scipy.integrate
 from superman.peaks.bump_fit import fit_single_peak, fit_composite_peak
 from threading import Lock
-from tornado import gen
 
 from .common import BaseHandler
 from ..thread_pool import run_cpu_bound
@@ -91,8 +90,7 @@ class PeakHandler(BaseHandler):
             self.write('\n')
         self.finish()
 
-    @gen.coroutine
-    def post(self):
+    async def post(self):
         fig_data = self.get_fig_data()
         if fig_data is None:
             self.visible_error(403, 'Broken connection to server.')
@@ -119,8 +117,8 @@ class PeakHandler(BaseHandler):
             lb = float(self.get_argument('lb'))
             ub = float(self.get_argument('ub'))
             bounds = sorted((lb, ub))
-            peak_x, peak_y, base, peak_data = yield gen.Task(
-                _async_peakfit, _manual_peak_area, spectrum, bounds, base_type)
+            peak_x, peak_y, base, peak_data = await _async_peakfit(
+                _manual_peak_area, spectrum, bounds, base_type)
             # show the area we integrated
             ax.fill_between(peak_x, base, peak_y, facecolor='gray', alpha=0.5)
         elif alg == 'fit':
@@ -129,8 +127,8 @@ class PeakHandler(BaseHandler):
             xres = float(self.get_argument('xres'))
             loc_fixed = bool(int(self.get_argument('locfixed')))
             bands, ints = spectrum.T
-            peak_mask, peak_y, peak_data = yield gen.Task(
-                _async_peakfit, fit_single_peak, bands, ints, loc,
+            peak_mask, peak_y, peak_data = await _async_peakfit(
+                fit_single_peak, bands, ints, loc,
                 fit_kind=kind, log_fn=logging.info,
                 band_resolution=xres, loc_fixed=loc_fixed)
             peak_x = bands[peak_mask]
@@ -146,8 +144,8 @@ class PeakHandler(BaseHandler):
                 self.visible_error(403, "Peak locations don't match # peaks")
                 return
             bands, ints = spectrum.T
-            peak_mask, peak_ys, peak_data = yield gen.Task(
-                _async_peakfit, fit_composite_peak, bands, ints, locs,
+            peak_mask, peak_ys, peak_data = await _async_peakfit(
+                fit_composite_peak, bands, ints, locs,
                 num_peaks=num_peaks, fit_kinds=kinds,
                 log_fn=logging.info, band_resolution=xres)
             peak_x = bands[peak_mask]
@@ -175,13 +173,11 @@ class PeakHandler(BaseHandler):
 
 
 def _async_peakfit(func, *args, **kwargs):
-    callback = kwargs.pop('callback')
     # Ensure all async peakfit calls have the global leastsq lock.
-
     def helper():
         with leastsq_lock:
-            return callback(func(*args, **kwargs))
-    run_cpu_bound(helper)
+            return func(*args, **kwargs)
+    return run_cpu_bound(helper)
 
 
 def _manual_peak_area(spectrum, bounds, base_type='region'):

@@ -8,4 +8,4 @@ PyYAML
 scikit-learn
 setuptools
 superman==0.1.2
-tornado==4.5.3
+tornado==6.5.10

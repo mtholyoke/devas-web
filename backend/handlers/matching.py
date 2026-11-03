@@ -6,7 +6,6 @@ import os
 from collections import defaultdict
 from superman.preprocess import preprocess
 from superman.dataset import LookupMetadata
-from tornado import gen
 
 from .common import BaseHandler, MultiDatasetHandler
 from ..thread_pool import run_cpu_bound
@@ -14,8 +13,7 @@ from six.moves import zip
 
 
 class SpectrumMatchingHandler(MultiDatasetHandler):
-    @gen.coroutine
-    def post(self):
+    async def post(self):
         fig_data = self.get_fig_data()
         if fig_data is None:
             self.visible_error(403, "Broken connection to server.")
@@ -63,7 +61,7 @@ class SpectrumMatchingHandler(MultiDatasetHandler):
             return
 
         try:
-            top_names, top_sim = yield gen.Task(_async_wsm, ds_views, query, kwargs)
+            top_names, top_sim = await _async_wsm(ds_views, query, kwargs)
         except ValueError as e:
             logging.error('During whole_spectrum_search: %s', str(e))
             return
@@ -115,9 +113,9 @@ class SpectrumMatchingHandler(MultiDatasetHandler):
             query_meta=query_meta)
 
 
-def _async_wsm(ds_views, query, wsm_kwargs, callback=None):
-    run_cpu_bound(target=lambda: callback(
-        ds_views.whole_spectrum_search(query, **wsm_kwargs)))
+def _async_wsm(ds_views, query, wsm_kwargs):
+    return run_cpu_bound(
+        lambda: ds_views.whole_spectrum_search(query, **wsm_kwargs))
 
 
 def _lookup_metas(ds_view):

@@ -5,6 +5,7 @@ import tornado.websocket
 import tornado.web
 import tornado.ioloop
 import tornado.httpserver
+import base64
 import socket
 import json
 import io
@@ -180,7 +181,7 @@ class MatplotlibServer(tornado.web.Application):
                 self.write_message(blob, binary=True)
             else:
                 data_uri = "data:image/png;base64,{0}".format(
-                    blob.encode('base64').replace('\n', ''))
+                    base64.b64encode(blob).decode('ascii'))
                 self.write_message(data_uri)
 
     def __init__(self, handlers, password=None, **kwargs):
@@ -205,7 +206,7 @@ class MatplotlibServer(tornado.web.Application):
         self.listen(port, max_body_size=max_size, max_buffer_size=max_size)
         print('Running at http://%s:%d/' % (socket.gethostname(), port))
         print('Press Ctrl+C to quit')
-        tornado.ioloop.IOLoop.instance().start()
+        tornado.ioloop.IOLoop.current().start()
 
     def register_new_figure(self, size):
         fig = Figure(figsize=size, facecolor='none', edgecolor='none',

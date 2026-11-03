@@ -11,11 +11,11 @@ from io import BytesIO, StringIO
 from six.moves import xrange
 from superman.file_io import parse_spectrum
 from threading import Thread
-from tornado import gen
 from tornado.escape import url_escape
 from zipfile import is_zipfile, ZipFile
 
 from .common import BaseHandler
+from ..thread_pool import run_in_thread
 from ..web_datasets import (
     UploadedSpectrumDataset,
     WebTrajDataset, WebVectorDataset, WebLIBSDataset, DATASETS,
@@ -64,8 +64,7 @@ class SpectrumUploadHandler(BaseHandler):
 
 
 class DatasetUploadHandler(BaseHandler):
-    @gen.coroutine
-    def post(self):
+    async def post(self):
         ds_name = self.get_argument('ds_name')
         ds_kind = self.get_argument('ds_kind')
         description = self.get_argument('desc')
@@ -92,8 +91,8 @@ class DatasetUploadHandler(BaseHandler):
 
         meta_file, = self.request.files.get('metadata', [None])
         spectra_file, = self.request.files['spectra']
-        err = yield gen.Task(_async_ds_upload, meta_file, spectra_file, ds_name,
-                             ds_kind, resample, description)
+        err = await _async_ds_upload(meta_file, spectra_file, ds_name,
+                                     ds_kind, resample, description)
         if err:
             self.visible_error(*err)
             return
@@ -109,7 +108,7 @@ class DatasetUploadHandler(BaseHandler):
 
 
 def _async_ds_upload(meta_file, spectra_file, ds_name, ds_kind, resample,
-                     description, callback=None):
+                     description):
     def helper():
         meta_kwargs, meta_pkeys, err = _load_metadata_csv(meta_file)
         if err is None:
@@ -124,11 +123,9 @@ def _async_ds_upload(meta_file, spectra_file, ds_name, ds_kind, resample,
                 fh.seek(0)
                 err = _vector_ds(fh, ds_name, ds_kind, meta_kwargs, meta_pkeys,
                                  resample, description)
-        callback(err)
+        return err
 
-    t = Thread(target=helper)
-    t.daemon = True
-    t.start()
+    return run_in_thread(helper)
 
 
 def _load_metadata_csv(f=None):

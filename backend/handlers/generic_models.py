@@ -153,8 +153,8 @@ class GenericModelHandler(MultiDatasetHandler):
 
 
 def async_crossval(fig_data, model_cls, num_vars, cv_args, cv_kwargs,
-                   xlabel='param', ylabel='MSE', logx=False, callback=None):
-    '''Wrap cross-validation calls in a Thread to avoid hanging the server.'''
+                   xlabel='param', ylabel='MSE', logx=False):
+    '''Run cross-validation off the IOLoop thread. Returns an awaitable.'''
     def helper():
         fig_data.figure.clf(keep_observers=True)
         axes = axes_grid(fig_data.figure, num_vars, xlabel, ylabel)
@@ -181,9 +181,8 @@ def async_crossval(fig_data, model_cls, num_vars, cv_args, cv_kwargs,
 
         fig_data.manager.canvas.draw()
         fig_data.last_plot = '%s_crossval' % model_cls.__name__
-        callback()
 
-    run_cpu_bound(helper)
+    return run_cpu_bound(helper)
 
 
 def axes_grid(fig, n, xlabel, ylabel):

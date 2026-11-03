@@ -2,7 +2,6 @@ from __future__ import absolute_import, print_function, division
 import logging
 import numpy as np
 import os
-from tornado import gen
 
 from .generic_models import GenericModelHandler, async_crossval, axes_grid
 from ..models import REGRESSION_MODELS
@@ -64,8 +63,7 @@ class RegressionModelHandler(GenericModelHandler):
                 self.write('%s,%s\n' % (key, row))
         self.finish()
 
-    @gen.coroutine
-    def post(self):
+    async def post(self):
         res = self.validate_inputs()
         if res is None:
             return
@@ -123,8 +121,8 @@ class RegressionModelHandler(GenericModelHandler):
                 plot_kwargs = dict(xlabel='# channels')
 
             # run the cross validation
-            yield gen.Task(async_crossval, fig_data, model_cls, num_vars, cv_args,
-                           cv_kwargs, **plot_kwargs)
+            await async_crossval(fig_data, model_cls, num_vars, cv_args,
+                                 cv_kwargs, **plot_kwargs)
             return
 
         if bool(int(do_train)):

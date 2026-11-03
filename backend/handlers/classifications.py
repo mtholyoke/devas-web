@@ -3,7 +3,6 @@ import logging
 import numpy as np
 import os
 from sklearn.metrics import confusion_matrix
-from tornado import gen
 
 from .generic_models import GenericModelHandler, async_crossval
 from ..models import CLASSIFICATION_MODELS, KNN
@@ -55,8 +54,7 @@ class ClassificationModelHandler(GenericModelHandler):
             self.write('%s,%s,%s\n' % row)
         self.finish()
 
-    @gen.coroutine
-    def post(self):
+    async def post(self):
         fig_data = self.get_fig_data()
         if fig_data is None:
             self.visible_error(403, "Broken connection to server.")
@@ -117,8 +115,8 @@ class ClassificationModelHandler(GenericModelHandler):
                 plot_kwargs['logx'] = True
 
             # run the cross validation
-            yield gen.Task(async_crossval, fig_data, model_cls, len(variables),
-                           cv_args, cv_kwargs, **plot_kwargs)
+            await async_crossval(fig_data, model_cls, len(variables),
+                                 cv_args, cv_kwargs, **plot_kwargs)
             return
 
         if bool(int(do_train)):
