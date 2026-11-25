@@ -150,6 +150,10 @@ class MatplotlibServer(tornado.web.Application):
 
         def open(self, fignum):
             self.fignum = int(fignum)
+            # matplotlib draws in worker threads (see thread_pool.py) and
+            # calls send_json/send_binary from there, but Tornado's
+            # write_message may only be used on the IOLoop's own thread.
+            self._ioloop = tornado.ioloop.IOLoop.current()
             # Register the websocket with the FigureManager.
             manager = self.application.figure_data[self.fignum].manager
             manager.add_web_socket(self)
@@ -173,16 +177,27 @@ class MatplotlibServer(tornado.web.Application):
                 manager = self.application.figure_data[self.fignum].manager
                 manager.handle_json(message)
 
+        def _send(self, message, binary=False):
+            # add_callback is the one thread-safe IOLoop method; callbacks run
+            # in order, so messages keep their sequence.
+            self._ioloop.add_callback(self._write, message, binary)
+
+        def _write(self, message, binary):
+            try:
+                self.write_message(message, binary=binary)
+            except tornado.websocket.WebSocketClosedError:
+                pass  # the browser went away before the draw finished
+
         def send_json(self, content):
-            self.write_message(json.dumps(content))
+            self._send(json.dumps(content))
 
         def send_binary(self, blob):
             if self.supports_binary:
-                self.write_message(blob, binary=True)
+                self._send(blob, binary=True)
             else:
                 data_uri = "data:image/png;base64,{0}".format(
                     base64.b64encode(blob).decode('ascii'))
-                self.write_message(data_uri)
+                self._send(data_uri)
 
     def __init__(self, handlers, password=None, **kwargs):
         handlers = [
